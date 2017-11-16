@@ -1,28 +1,37 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <random.h>
 #include <unistd.h>
 #include <time.h>
 
 int main()
 {
-  printf("initial message prior to forking");
+  printf("initial message prior to forking\n");
 
-  pid_t f0;
-  f0 = fork();
-  if (f0) {
-    pid_t f1;
-    f1 = fork();
+  pid_t f;
+  f = fork();
+
+  if (f) {
+    f = fork();
   }
 
-  if (f0 || f1) {
+  if (f) {
     int status;
-    printf("pid of completed child: %d", wait(&status));
-    printf("The child was asleep for %d seconds.", status);
+    printf("pid of completed child: %d\n", wait(&status));
+    printf("The child was asleep for %d seconds.\n", status);
+    printf("Parent: My work here is done.\n");
   } else {
+    int limit;
+    int r;
+
     srand(time(NULL));
-    printf("pid of this child: %d", getpid());
-    sleep(rand()); // change to be [5, 20] http://www.cs.yale.edu/homes/aspnes/pinewiki/C(2f)Randomization.html
+    printf("Child: My pid is %d!\n", getpid());
+
+    // Sleep for a random number of seconds in the range [5, 20]
+    limit = RAND_MAX - (RAND_MAX % 16);
+    while ((r = rand()) >= limit);
+    sleep((r % 16) + 5);
+
+    printf("Child: I'm finished!");
   }
 
   return 0;
